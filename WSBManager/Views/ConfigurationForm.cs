@@ -22,7 +22,11 @@ public class ConfigurationForm : UserControl, IActivatableView
             defaultBindingMode: BindingMode.TwoWay
         );
 
-    private readonly StackPanel _stackPanel = new StackPanel();
+    private readonly Grid _grid = new Grid()
+    {
+        ShowGridLines = true,
+        Margin = new Thickness(10),
+    };
 
     public Configuration Configuration
     {
@@ -32,7 +36,10 @@ public class ConfigurationForm : UserControl, IActivatableView
 
     public ConfigurationForm()
     {
-        Content = _stackPanel;
+        Content = _grid;
+
+        _grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        _grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
         this.WhenActivated(disposables =>
         {
@@ -45,7 +52,7 @@ public class ConfigurationForm : UserControl, IActivatableView
                 serializer.Serialize(writer, Configuration);
                 var xml = writer.ToString();
                 Debug.WriteLine($"Configuration changed to:\n{xml}");
-                _stackPanel.Children.Clear();
+                _grid.Children.Clear();
                 ReloadConfiguration();
             }).DisposeWith(disposables);
         });
@@ -53,14 +60,9 @@ public class ConfigurationForm : UserControl, IActivatableView
 
     private void ReloadConfiguration()
     {
+        var currentRow = 0;
         foreach (var prop in Configuration.GetType().GetProperties())
         {
-            var panel = new StackPanel
-            {
-                Orientation = Avalonia.Layout.Orientation.Horizontal,
-                Margin = new Avalonia.Thickness(0, 5),
-            };
-
             var label = new TextBlock { Text = prop.Name + ": ", };
 
             Control inputControl = prop.PropertyType switch
@@ -89,9 +91,17 @@ public class ConfigurationForm : UserControl, IActivatableView
                 }
             );
 
-            panel.Children.Add(label);
-            panel.Children.Add(inputControl);
-            _stackPanel.Children.Add(panel);
+            label.Margin = new Thickness(5);
+            inputControl.Margin = new Thickness(5);
+            Grid.SetRow(label, currentRow);
+            Grid.SetRow(inputControl, currentRow);
+            Grid.SetColumn(label, 0);
+            Grid.SetColumn(inputControl, 1);
+            _grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            _grid.Children.Add(label);
+            _grid.Children.Add(inputControl);
+
+            currentRow++;
         }
     }
 
