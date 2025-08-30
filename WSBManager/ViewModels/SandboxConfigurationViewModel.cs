@@ -17,7 +17,6 @@ public class SandboxConfigurationViewModel : ReactiveObject
 
     public SandboxConfigurationViewModel()
     {
-        Debug.WriteLine("SandboxConfigurationViewModel initialized");
         LoadConfigurationFromFile = ReactiveCommand.Create(LoadConfiguration);
         SaveConfigurationToFile = ReactiveCommand.Create(SaveConfiguration);
     }
@@ -25,9 +24,7 @@ public class SandboxConfigurationViewModel : ReactiveObject
     private void LoadConfiguration()
     {
         Console.WriteLine("Loading configuration from file: " + ConfigurationFilePath);
-        Debug.WriteLine("Loading configuration from file: " + ConfigurationFilePath);
         ConfigurationFilePath = ConfigurationFilePath.Trim(' ', '\"', '\'');
-        // TODO: Implement loading configuration from file
         var serializer = new System.Xml.Serialization.XmlSerializer(typeof(Configuration));
         try
         {
@@ -37,14 +34,13 @@ public class SandboxConfigurationViewModel : ReactiveObject
         }
         catch (Exception ex)
         {
-            Debug.WriteLine("Error loading configuration: " + ex.Message);
+            Console.WriteLine($"Error loading configuration: {ex.Message}");
         }
     }
 
     private void SaveConfiguration()
     {
         Console.WriteLine("Saving configuration to file: " + ConfigurationFilePath);
-        Debug.WriteLine("Saving configuration to file: " + ConfigurationFilePath);
         // TODO: Implement saving configuration to file
         var serializer = new System.Xml.Serialization.XmlSerializer(typeof(Configuration));
         var writer = new System.IO.StringWriter();

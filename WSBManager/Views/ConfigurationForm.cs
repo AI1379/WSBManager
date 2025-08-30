@@ -9,6 +9,7 @@ using System.Reflection;
 using Avalonia;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
+using Avalonia.Layout;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using WSBManager.Models;
@@ -176,7 +177,7 @@ public class ConfigurationForm : UserControl, IActivatableView
             }
         );
 
-        var addButton = new Button { Content = "Add" };
+        var addButton = new Button { Content = "Add", Margin = new Thickness(5) };
         addButton.Click += (_, _) =>
         {
             Debug.WriteLine($"Adding {propName}");
@@ -189,8 +190,22 @@ public class ConfigurationForm : UserControl, IActivatableView
             dataGrid.ItemsSource = configListRef.Cast<object>().ToList();
         };
 
+        var removeButton = new Button { Content = "Remove", Margin = new Thickness(5) };
+        removeButton.Click += (_, _) =>
+        {
+            if (dataGrid.SelectedItem == null) return;
+            Debug.WriteLine($"Removing selected item from {propName}");
+            var configListRef = prop.GetValue(Configuration) as IList ?? throw new NullReferenceException();
+            configListRef.Remove(dataGrid.SelectedItem);
+            dataGrid.ItemsSource = configListRef.Cast<object>().ToList();
+        };
+
+        var buttonPanel = new StackPanel { Orientation = Orientation.Horizontal };
+        buttonPanel.Children.Add(addButton);
+        buttonPanel.Children.Add(removeButton);
+
         panel.Children.Add(dataGrid);
-        panel.Children.Add(addButton);
+        panel.Children.Add(buttonPanel);
 
         return panel;
     }
