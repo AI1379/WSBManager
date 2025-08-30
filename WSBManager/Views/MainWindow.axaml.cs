@@ -1,0 +1,15 @@
+using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.ReactiveUI;
+using WSBManager.ViewModels;
+
+namespace WSBManager.Views;
+
+public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
+{
+    public MainWindow()
+    {
+        DataContext = new MainWindowViewModel();
+        InitializeComponent();
+    }
+}

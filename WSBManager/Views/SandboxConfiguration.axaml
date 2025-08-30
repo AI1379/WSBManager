@@ -1,0 +1,27 @@
+﻿<reactiveui:ReactiveUserControl
+    x:TypeArguments="vm:SandboxConfigurationViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:reactiveui="http://reactiveui.net"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:WSBManager.ViewModels"
+    xmlns:local="clr-namespace:WSBManager.Views"
+    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+    x:DataType="vm:SandboxConfigurationViewModel"
+    x:Class="WSBManager.Views.SandboxConfiguration">
+    <StackPanel x:Name="StackPanel">
+        <TextBlock>This is the Sandbox Configuration component</TextBlock>
+        <TextBox Text="{Binding ConfigurationFilePath}"></TextBox>
+        <local:ConfigurationForm
+            Configuration="{Binding Configuration}"
+            x:Name="ConfigurationForm">
+        </local:ConfigurationForm>
+        <Button Command="{Binding LoadConfigurationFromFile}">
+            Load Configuration from file
+        </Button>
+        <Button Command="{Binding SaveConfigurationToFile}">
+            Save Configuration
+        </Button>
+    </StackPanel>
+</reactiveui:ReactiveUserControl>
