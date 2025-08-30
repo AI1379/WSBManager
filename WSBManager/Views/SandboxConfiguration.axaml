@@ -12,16 +12,21 @@
     x:Class="WSBManager.Views.SandboxConfiguration">
     <StackPanel x:Name="StackPanel">
         <TextBlock>This is the Sandbox Configuration component</TextBlock>
-        <TextBox Text="{Binding ConfigurationFilePath}"></TextBox>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock VerticalAlignment="Center">Config file path: </TextBlock>
+            <TextBox Text="{Binding ConfigurationFilePath}"></TextBox>
+        </StackPanel>
         <local:ConfigurationForm
             Configuration="{Binding Configuration}"
             x:Name="ConfigurationForm">
         </local:ConfigurationForm>
-        <Button Command="{Binding LoadConfigurationFromFile}">
-            Load Configuration from file
-        </Button>
-        <Button Command="{Binding SaveConfigurationToFile}">
-            Save Configuration
-        </Button>
+        <StackPanel Orientation="Horizontal">
+            <Button Command="{Binding LoadConfigurationFromFile}" Margin="5">
+                Load Configuration from file
+            </Button>
+            <Button Command="{Binding SaveConfigurationToFile}" Margin="5">
+                Save Configuration
+            </Button>
+        </StackPanel>
     </StackPanel>
 </reactiveui:ReactiveUserControl>

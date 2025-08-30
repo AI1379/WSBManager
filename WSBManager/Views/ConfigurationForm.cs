@@ -27,7 +27,6 @@ public class ConfigurationForm : UserControl, IActivatableView
     private readonly Grid _grid = new Grid()
     {
         ShowGridLines = true,
-        Margin = new Thickness(10),
     };
 
     public Configuration Configuration
@@ -65,7 +64,11 @@ public class ConfigurationForm : UserControl, IActivatableView
         var currentRow = 0;
         foreach (var prop in Configuration.GetType().GetProperties())
         {
-            var label = new TextBlock { Text = prop.Name + ": ", };
+            var label = new TextBlock
+            {
+                Text = prop.Name + ": ",
+                VerticalAlignment = VerticalAlignment.Center
+            };
 
             Control inputControl = prop.PropertyType switch
             {

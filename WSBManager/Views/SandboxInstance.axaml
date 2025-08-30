@@ -11,6 +11,6 @@
     x:Class="WSBManager.Views.SandboxInstance">
     <StackPanel>
         <TextBlock>This is Sandbox Instance component</TextBlock>
-        <local:SandboxConfiguration></local:SandboxConfiguration>
+        <local:SandboxConfiguration Margin="10"></local:SandboxConfiguration>
     </StackPanel>
 </reactiveui:ReactiveUserControl>
