@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reflection;
 using Avalonia;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
@@ -67,29 +68,13 @@ public class ConfigurationForm : UserControl, IActivatableView
 
             Control inputControl = prop.PropertyType switch
             {
-                { } t when t == typeof(string) => new TextBox
-                {
-                    Text = prop.GetValue(Configuration) as string ?? string.Empty,
-                    Watermark = $"Enter {prop.Name}..."
-                },
-                { } t when t == typeof(int) => CreateNumericUpDown((int)(prop.GetValue(Configuration) ?? 0)),
-                { } t when t.IsEnum => CreateEnumComboBox(t, prop.GetValue(Configuration) ?? null),
-                { } t when t != typeof(string) && typeof(IEnumerable).IsAssignableFrom(t) =>
-                    CreateListBox(prop.GetValue(Configuration) as IEnumerable),
+                { } t when t == typeof(string) => CreateTextBox(prop.Name, prop.GetValue(Configuration) as string),
+                { } t when t == typeof(int) => CreateNumericUpDown(prop.Name, (int)(prop.GetValue(Configuration) ?? 0)),
+                { } t when t.IsEnum => CreateEnumComboBox(prop.Name, t, prop.GetValue(Configuration) ?? null),
+                { } t when t != typeof(string) && typeof(IList).IsAssignableFrom(t) =>
+                    CreateListBox(prop, prop.GetValue(Configuration) as IList, t),
                 _ => new TextBlock { Text = $"Unsupported type: {prop.PropertyType.Name}" }
             };
-
-            Debug.WriteLine(
-                $"Binding {prop.Name} of type {prop.PropertyType.Name} using control {inputControl.GetType().Name}");
-
-            inputControl.Bind(
-                GetBindingProperty(inputControl),
-                new Binding(prop.Name)
-                {
-                    Source = Configuration,
-                    Mode = BindingMode.TwoWay
-                }
-            );
 
             label.Margin = new Thickness(5);
             inputControl.Margin = new Thickness(5);
@@ -105,7 +90,26 @@ public class ConfigurationForm : UserControl, IActivatableView
         }
     }
 
-    private static NumericUpDown CreateNumericUpDown(int currentValue, int step = 128)
+    private TextBox CreateTextBox(string propName, string? text = null, string? watermark = null)
+    {
+        var textBox = new TextBox
+        {
+            Text = text ?? string.Empty,
+            Watermark = watermark ?? $"Enter {propName}...",
+        };
+
+        textBox.Bind(
+            TextBox.TextProperty,
+            new Binding(propName)
+            {
+                Source = Configuration,
+                Mode = BindingMode.TwoWay
+            }
+        );
+        return textBox;
+    }
+
+    private NumericUpDown CreateNumericUpDown(string propName, int currentValue, int step = 128)
     {
         var numericUpDown = new NumericUpDown
         {
@@ -114,11 +118,21 @@ public class ConfigurationForm : UserControl, IActivatableView
             Value = currentValue,
             Increment = step,
         };
+
+        numericUpDown.Bind(
+            NumericUpDown.ValueProperty,
+            new Binding(propName)
+            {
+                Source = Configuration,
+                Mode = BindingMode.TwoWay
+            }
+        );
+
         return numericUpDown;
     }
 
 
-    private ComboBox CreateEnumComboBox(Type enumType, object? currentValue)
+    private ComboBox CreateEnumComboBox(string propName, Type enumType, object? currentValue)
     {
         if (!enumType.IsEnum)
             throw new ArgumentException("Invalid enum type or value.");
@@ -127,12 +141,24 @@ public class ConfigurationForm : UserControl, IActivatableView
             .ForEach(enumValue => comboBox.Items.Add(enumValue));
         if (currentValue != null)
             comboBox.SelectedItem = currentValue;
+
+        comboBox.Bind(
+            SelectingItemsControl.SelectedItemProperty,
+            new Binding(propName)
+            {
+                Source = Configuration,
+                Mode = BindingMode.TwoWay
+            }
+        );
         return comboBox;
     }
 
-    private static DataGrid CreateListBox(IEnumerable? list)
+    private StackPanel CreateListBox(PropertyInfo prop, IList? list, Type listType)
     {
-        if (list == null) throw new ArgumentNullException($"List is null");
+        var propName = prop.Name;
+        ArgumentNullException.ThrowIfNull(list);
+
+        var panel = new StackPanel();
         var itemsSource = list.Cast<object>().ToList();
         Debug.WriteLine($"Current list value: {string.Join(", ", itemsSource)}");
         var dataGrid = new DataGrid
@@ -140,16 +166,32 @@ public class ConfigurationForm : UserControl, IActivatableView
             AutoGenerateColumns = true,
             ItemsSource = itemsSource,
         };
-        return dataGrid;
-    }
 
-    private static AvaloniaProperty GetBindingProperty(Control control) => control switch
-    {
-        TextBox => TextBox.TextProperty,
-        NumericUpDown => NumericUpDown.ValueProperty,
-        ComboBox => SelectingItemsControl.SelectedItemProperty,
-        ListBox => ListBox.SelectedItemsProperty,
-        DataGrid => DataGrid.ItemsSourceProperty,
-        _ => throw new NotSupportedException($"Control type {control.GetType().Name} is not supported for binding.")
-    };
+        dataGrid.Bind(
+            DataGrid.ItemsSourceProperty,
+            new Binding(propName)
+            {
+                Source = Configuration,
+                Mode = BindingMode.TwoWay
+            }
+        );
+
+        var addButton = new Button { Content = "Add" };
+        addButton.Click += (_, _) =>
+        {
+            Debug.WriteLine($"Adding {propName}");
+            Debug.WriteLine($"List type: {listType}, element type: {listType.GenericTypeArguments[0]}");
+            var elementType = listType.GenericTypeArguments[0];
+            Debug.WriteLine($"Element type: {elementType} (IsValueType: {elementType.IsValueType})");
+            var newItem = Activator.CreateInstance(elementType) ?? throw new NullReferenceException();
+            var configListRef = prop.GetValue(Configuration) as IList ?? throw new NullReferenceException();
+            configListRef.Add(newItem);
+            dataGrid.ItemsSource = configListRef.Cast<object>().ToList();
+        };
+
+        panel.Children.Add(dataGrid);
+        panel.Children.Add(addButton);
+
+        return panel;
+    }
 }
