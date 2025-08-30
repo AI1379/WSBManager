@@ -26,23 +26,4 @@ public class MainWindowViewModel : ReactiveObject
         Items.Add(TextBoxContent);
         this.RaisePropertyChanged(nameof(MainWindowText));
     }
-
-    public string TestXml()
-    {
-        var configuration = new Configuration();
-        configuration.MappedFolders.Add(new MappedFolder
-            { HostFolder = "C:\\HostFolder1", SandboxFolder = "C:\\SandboxFolder1", ReadOnly = false });
-        configuration.LogonCommand = @"C:\SandboxFolder1\runme.exe";
-        var serializer = new System.Xml.Serialization.XmlSerializer(typeof(Configuration));
-        var settings = new XmlWriterSettings
-        {
-            Indent = true,
-            OmitXmlDeclaration = true,
-        };
-        var textWriter = new System.IO.StringWriter();
-        using var xmlWriter = XmlWriter.Create(textWriter, settings);
-        serializer.Serialize(xmlWriter, configuration);
-        var str = textWriter.ToString();
-        return str;
-    }
 }

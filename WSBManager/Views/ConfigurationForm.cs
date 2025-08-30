@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using Avalonia.Controls;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -65,10 +66,14 @@ public class ConfigurationForm : UserControl, IActivatableView
             Control inputControl = prop.PropertyType switch
             {
                 { } t when t == typeof(string) => new TextBox
-                    { Text = prop.GetValue(Configuration) as string ?? string.Empty, Width = 300 },
+                {
+                    Text = prop.GetValue(Configuration) as string ?? string.Empty,
+                    Watermark = $"Enter {prop.Name}..."
+                },
                 { } t when t == typeof(int) => CreateNumericUpDown((int)(prop.GetValue(Configuration) ?? 0)),
                 { } t when t.IsEnum => CreateEnumComboBox(t, prop.GetValue(Configuration) ?? null),
-                { } t when t == typeof(List<MappedFolder>) => CreateMappedFolderListBox(),
+                { } t when t != typeof(string) && typeof(IEnumerable).IsAssignableFrom(t) =>
+                    CreateListBox(prop.GetValue(Configuration) as IEnumerable),
                 _ => new TextBlock { Text = $"Unsupported type: {prop.PropertyType.Name}" }
             };
 
@@ -83,11 +88,6 @@ public class ConfigurationForm : UserControl, IActivatableView
                     Mode = BindingMode.TwoWay
                 }
             );
-
-            if (inputControl is ComboBox comboBox)
-            {
-                Debug.WriteLine($"ComboBox selected item before binding: {comboBox.SelectedItem}");
-            }
 
             panel.Children.Add(label);
             panel.Children.Add(inputControl);
@@ -120,14 +120,17 @@ public class ConfigurationForm : UserControl, IActivatableView
         return comboBox;
     }
 
-    // TODO: Use DataGrid or similar for better UX
-    private static ListBox CreateMappedFolderListBox()
+    private static DataGrid CreateListBox(IEnumerable? list)
     {
-        // TODO: Implement adding/removing items
-        var listBox = new ListBox();
-        listBox.Height = 100;
-        listBox.SelectionMode = SelectionMode.Multiple;
-        return listBox;
+        if (list == null) throw new ArgumentNullException($"List is null");
+        var itemsSource = list.Cast<object>().ToList();
+        Debug.WriteLine($"Current list value: {string.Join(", ", itemsSource)}");
+        var dataGrid = new DataGrid
+        {
+            AutoGenerateColumns = true,
+            ItemsSource = itemsSource,
+        };
+        return dataGrid;
     }
 
     private static AvaloniaProperty GetBindingProperty(Control control) => control switch
@@ -136,6 +139,7 @@ public class ConfigurationForm : UserControl, IActivatableView
         NumericUpDown => NumericUpDown.ValueProperty,
         ComboBox => SelectingItemsControl.SelectedItemProperty,
         ListBox => ListBox.SelectedItemsProperty,
+        DataGrid => DataGrid.ItemsSourceProperty,
         _ => throw new NotSupportedException($"Control type {control.GetType().Name} is not supported for binding.")
     };
 }

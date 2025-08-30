@@ -26,6 +26,7 @@ public class SandboxConfigurationViewModel : ReactiveObject
     {
         Console.WriteLine("Loading configuration from file: " + ConfigurationFilePath);
         Debug.WriteLine("Loading configuration from file: " + ConfigurationFilePath);
+        ConfigurationFilePath = ConfigurationFilePath.Trim(' ', '\"', '\'');
         // TODO: Implement loading configuration from file
         var serializer = new System.Xml.Serialization.XmlSerializer(typeof(Configuration));
         try
