@@ -10,23 +10,27 @@
     mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
     x:DataType="vm:SandboxConfigurationViewModel"
     x:Class="WSBManager.Views.SandboxConfiguration">
-    <StackPanel x:Name="StackPanel">
-        <TextBlock>This is the Sandbox Configuration component</TextBlock>
-        <StackPanel Orientation="Horizontal">
-            <TextBlock VerticalAlignment="Center">Config file path: </TextBlock>
-            <TextBox Text="{Binding ConfigurationFilePath}"></TextBox>
-        </StackPanel>
-        <local:ConfigurationForm
-            Configuration="{Binding Configuration}"
-            x:Name="ConfigurationForm">
-        </local:ConfigurationForm>
-        <StackPanel Orientation="Horizontal">
-            <Button Command="{Binding LoadConfigurationFromFile}" Margin="5">
-                Load Configuration from file
-            </Button>
-            <Button Command="{Binding SaveConfigurationToFile}" Margin="5">
-                Save Configuration
-            </Button>
-        </StackPanel>
-    </StackPanel>
+    <DockPanel x:Name="StackPanel">
+        <TextBlock DockPanel.Dock="Top">This is the Sandbox Configuration component</TextBlock>
+        <ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Stretch" DockPanel.Dock="Top">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                    <TextBlock VerticalAlignment="Center">Config file path: </TextBlock>
+                    <TextBox Text="{Binding ConfigurationFilePath}"></TextBox>
+                </StackPanel>
+                <local:ConfigurationForm
+                    Configuration="{Binding Configuration}"
+                    x:Name="ConfigurationForm">
+                </local:ConfigurationForm>
+                <StackPanel Orientation="Horizontal">
+                    <Button Command="{Binding LoadConfigurationFromFile}" Margin="5">
+                        Load Configuration from file
+                    </Button>
+                    <Button Command="{Binding SaveConfigurationToFile}" Margin="5">
+                        Save Configuration
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
 </reactiveui:ReactiveUserControl>

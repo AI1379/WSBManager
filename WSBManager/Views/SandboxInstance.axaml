@@ -9,8 +9,8 @@
     xmlns:vm="clr-namespace:WSBManager.ViewModels"
     mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
     x:Class="WSBManager.Views.SandboxInstance">
-    <StackPanel>
-        <TextBlock>This is Sandbox Instance component</TextBlock>
-        <local:SandboxConfiguration Margin="10"></local:SandboxConfiguration>
-    </StackPanel>
+    <DockPanel>
+        <TextBlock DockPanel.Dock="Top">This is Sandbox Instance component</TextBlock>
+        <local:SandboxConfiguration Margin="10" DockPanel.Dock="Top"></local:SandboxConfiguration>
+    </DockPanel>
 </reactiveui:ReactiveUserControl>
