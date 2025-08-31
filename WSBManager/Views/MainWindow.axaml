@@ -8,10 +8,9 @@
         x:Class="WSBManager.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="WSBManager">
-    <Design.DataContext>
-        <vm:MainWindowViewModel />
-    </Design.DataContext>
     <DockPanel>
-        <local:SandboxInstance></local:SandboxInstance>
+        <local:SandboxInstance
+            DataContext="{Binding SandboxInstanceViewModel}">
+        </local:SandboxInstance>
     </DockPanel>
 </Window>

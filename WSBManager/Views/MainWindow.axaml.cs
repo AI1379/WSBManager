@@ -9,7 +9,6 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 {
     public MainWindow()
     {
-        DataContext = new MainWindowViewModel();
         InitializeComponent();
     }
 }

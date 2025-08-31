@@ -10,20 +10,11 @@ namespace WSBManager.ViewModels;
 
 public class MainWindowViewModel : ReactiveObject
 {
-    private int _clickCount;
+    public SandboxInstanceViewModel SandboxInstanceViewModel { get; }
 
-    public ObservableCollection<string> Items { get; } = [];
-
-    public string TextBoxContent { get; set; } = "Hello, World!";
-
-
-    public string MainWindowText =>
-        $"Welcome to WSBManager! Click count: {_clickCount}, TextBox content: {TextBoxContent}";
-
-    public void IncrementClickCount()
+    public MainWindowViewModel(SandboxInstanceViewModel sandboxInstanceViewModel)
     {
-        _clickCount++;
-        Items.Add(TextBoxContent);
-        this.RaisePropertyChanged(nameof(MainWindowText));
+        SandboxInstanceViewModel = sandboxInstanceViewModel;
+        Debug.WriteLine("MainWindowViewModel initialized");
     }
 }

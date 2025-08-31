@@ -10,7 +10,6 @@ public partial class SandboxInstance : ReactiveUserControl<SandboxInstanceViewMo
 {
     public SandboxInstance()
     {
-        DataContext = new SandboxInstanceViewModel();
         InitializeComponent();
     }
 }

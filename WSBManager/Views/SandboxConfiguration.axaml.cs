@@ -15,7 +15,6 @@ public partial class SandboxConfiguration : ReactiveUserControl<SandboxConfigura
     public SandboxConfiguration()
     {
         InitializeComponent();
-        DataContext = ViewModel = new SandboxConfigurationViewModel();
         this.WhenActivated(disposables => { Debug.WriteLine("Sandbox configuration activated"); });
     }
 }

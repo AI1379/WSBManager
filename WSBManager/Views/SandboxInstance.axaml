@@ -7,10 +7,14 @@
     xmlns:reactiveui="http://reactiveui.net"
     xmlns:local="clr-namespace:WSBManager.Views"
     xmlns:vm="clr-namespace:WSBManager.ViewModels"
+    x:DataType="vm:SandboxInstanceViewModel"
     mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
     x:Class="WSBManager.Views.SandboxInstance">
     <DockPanel>
         <TextBlock DockPanel.Dock="Top">This is Sandbox Instance component</TextBlock>
-        <local:SandboxConfiguration Margin="10" DockPanel.Dock="Top"></local:SandboxConfiguration>
+        <local:SandboxConfiguration
+            Margin="10" DockPanel.Dock="Top"
+            DataContext="{Binding SandboxConfigurationViewModel}">
+        </local:SandboxConfiguration>
     </DockPanel>
 </reactiveui:ReactiveUserControl>
