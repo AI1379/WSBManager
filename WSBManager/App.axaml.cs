@@ -6,6 +6,7 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 using Splat;
+using WSBManager.Services;
 using WSBManager.ViewModels;
 
 namespace WSBManager;
@@ -22,8 +23,10 @@ public partial class App : Application
         var services = new ServiceCollection();
 
         services.AddSingleton<MainWindowViewModel>();
-        services.AddScoped<SandboxInstanceViewModel>();
-        services.AddScoped<SandboxConfigurationViewModel>();
+        services.AddTransient<SandboxInstanceViewModel>();
+        services.AddTransient<SandboxConfigurationViewModel>();
+
+        services.AddSingleton<IViewModelFactory, ViewModelFactory>();
 
         var serviceProvider = services.BuildServiceProvider();
 

@@ -12,6 +12,7 @@ using DynamicData.Binding;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using WSBManager.Models;
+using WSBManager.Services;
 
 namespace WSBManager.ViewModels;
 
@@ -24,11 +25,14 @@ public class MainWindowViewModel : ReactiveObject
     public ReactiveCommand<Unit, Unit> AddTab { get; }
     [Reactive] public int SelectedTabIndex { get; set; } = -1;
 
-    public SandboxInstanceViewModel SandboxInstanceViewModel { get; }
+    private readonly ObservableCollection<SandboxInstanceViewModel> _sandboxInstances = [];
+    [Reactive] public SandboxInstanceViewModel? SandboxInstanceViewModel { get; set; }
 
-    public MainWindowViewModel(SandboxInstanceViewModel sandboxInstanceViewModel)
+    private readonly IViewModelFactory _viewModelFactory;
+
+    public MainWindowViewModel(IViewModelFactory viewModelFactory)
     {
-        SandboxInstanceViewModel = sandboxInstanceViewModel;
+        _viewModelFactory = viewModelFactory ?? throw new ArgumentNullException(nameof(viewModelFactory));
 
         _tabsSource.Connect()
             .Bind(out _tabs)
@@ -36,15 +40,29 @@ public class MainWindowViewModel : ReactiveObject
 
         AddTab = ReactiveCommand.Create(AddNewTab);
 
+        AddNewTab();
+        SwitchToTab(0);
+
+        this.WhenAnyValue(x => x.SelectedTabIndex)
+            .Where(x => x != -1 && x < _tabs.Count)
+            .Subscribe(SwitchToTab);
+
         Debug.WriteLine("MainWindowViewModel initialized");
+    }
+
+    private void SwitchToTab(int index)
+    {
+        SandboxInstanceViewModel = _sandboxInstances[index];
+        Debug.WriteLine($"Switched to tab index: {index}, Name: {_tabs[index].Value}");
     }
 
     private void AddNewTab()
     {
         var newTabName = $"Tab {_tabs.Count + 1}";
         _tabsSource.Add(new EditableItem<string>(newTabName));
-        Debug.WriteLine($"Current tabs: {string.Join(", ", _tabs.Select(t => t.Value))}");
-        Debug.WriteLine($"Selected tab index before adding: {SelectedTabIndex}");
+        _sandboxInstances.Add(_viewModelFactory.Create<SandboxInstanceViewModel>());
+        SelectedTabIndex = _tabs.Count - 1;
+        SwitchToTab(_tabs.Count - 1);
         Debug.WriteLine($"Added new tab: {newTabName}");
     }
 }

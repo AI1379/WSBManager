@@ -10,11 +10,16 @@
         Title="WSBManager">
     <Grid ColumnDefinitions="*, 4, 4*">
         <DockPanel Grid.Column="0">
+            <Button
+                Command="{Binding AddTab}"
+                HorizontalAlignment="Center"
+                DockPanel.Dock="Bottom">
+                Add
+            </Button>
             <ListBox
                 ItemsSource="{Binding Tabs}"
                 SelectionMode="Single, AlwaysSelected"
-                SelectedIndex="{Binding SelectedTabIndex}"
-                DockPanel.Dock="Top">
+                SelectedIndex="{Binding SelectedTabIndex}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <TextBox Text="{Binding Value, Mode=TwoWay}"
@@ -23,7 +28,6 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <Button Command="{Binding AddTab}">Add</Button>
         </DockPanel>
         <GridSplitter Grid.Column="1" ResizeDirection="Columns"></GridSplitter>
         <local:SandboxInstance
