@@ -1,4 +1,3 @@
-using System.ComponentModel.Design;
 using System.Reflection;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;

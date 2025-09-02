@@ -1,7 +1,5 @@
 ﻿using System.Diagnostics;
-using System.Reactive;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 namespace WSBManager.ViewModels;
 

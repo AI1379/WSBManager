@@ -1,9 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Reactive.Disposables;
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 using ReactiveUI;
 using WSBManager.ViewModels;

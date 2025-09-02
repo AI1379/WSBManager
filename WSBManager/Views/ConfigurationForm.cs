@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using Avalonia.Controls;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -11,7 +10,6 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Layout;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using WSBManager.Models;
 
 namespace WSBManager.Views;
