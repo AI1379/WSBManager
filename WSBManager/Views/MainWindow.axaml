@@ -8,9 +8,27 @@
         x:Class="WSBManager.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="WSBManager">
-    <DockPanel>
+    <Grid ColumnDefinitions="*, 4, 4*">
+        <DockPanel Grid.Column="0">
+            <ListBox
+                ItemsSource="{Binding Tabs}"
+                SelectionMode="Single, AlwaysSelected"
+                SelectedIndex="{Binding SelectedTabIndex}"
+                DockPanel.Dock="Top">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBox Text="{Binding Value, Mode=TwoWay}"
+                                 BorderThickness="0">
+                        </TextBox>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Button Command="{Binding AddTab}">Add</Button>
+        </DockPanel>
+        <GridSplitter Grid.Column="1" ResizeDirection="Columns"></GridSplitter>
         <local:SandboxInstance
-            DataContext="{Binding SandboxInstanceViewModel}">
+            DataContext="{Binding SandboxInstanceViewModel}"
+            Grid.Column="2">
         </local:SandboxInstance>
-    </DockPanel>
+    </Grid>
 </Window>
