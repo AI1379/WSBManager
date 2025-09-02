@@ -11,20 +11,30 @@
     <Grid ColumnDefinitions="*, 4, 4*">
         <DockPanel Grid.Column="0">
             <Button
-                Command="{Binding AddTab}"
+                Command="{Binding AddTabCmd}"
                 HorizontalAlignment="Center"
                 DockPanel.Dock="Bottom">
                 Add
             </Button>
             <ListBox
+                x:Name="TabList"
                 ItemsSource="{Binding Tabs}"
                 SelectionMode="Single, AlwaysSelected"
                 SelectedIndex="{Binding SelectedTabIndex}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBox Text="{Binding Value, Mode=TwoWay}"
-                                 BorderThickness="0">
-                        </TextBox>
+                        <DockPanel>
+                            <!-- ReSharper disable once Xaml.PossibleNullReferenceException -->
+                            <Button
+                                Command="{Binding $parent[ListBox].((vm:MainWindowViewModel)DataContext).RemoveTabCmd}"
+                                CommandParameter="{Binding}"
+                                DockPanel.Dock="Right">
+                                -
+                            </Button>
+                            <TextBox Text="{Binding Value, Mode=TwoWay}"
+                                     BorderThickness="0">
+                            </TextBox>
+                        </DockPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

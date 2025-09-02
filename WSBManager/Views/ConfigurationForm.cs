@@ -48,11 +48,6 @@ public class ConfigurationForm : UserControl, IActivatableView
 
             this.GetObservable(ConfigurationProperty).Subscribe(_ =>
             {
-                var serializer = new System.Xml.Serialization.XmlSerializer(typeof(Configuration));
-                var writer = new System.IO.StringWriter();
-                serializer.Serialize(writer, Configuration);
-                var xml = writer.ToString();
-                Debug.WriteLine($"Configuration changed to:\n{xml}");
                 _grid.Children.Clear();
                 ReloadConfiguration();
             }).DisposeWith(disposables);
@@ -76,7 +71,7 @@ public class ConfigurationForm : UserControl, IActivatableView
                 { } t when t == typeof(int) => CreateNumericUpDown(prop.Name, (int)(prop.GetValue(Configuration) ?? 0)),
                 { } t when t.IsEnum => CreateEnumComboBox(prop.Name, t, prop.GetValue(Configuration) ?? null),
                 { } t when t != typeof(string) && typeof(IList).IsAssignableFrom(t) =>
-                    CreateListBox(prop, prop.GetValue(Configuration) as IList, t),
+                    CreateDataGrid(prop, prop.GetValue(Configuration) as IList, t),
                 _ => new TextBlock { Text = $"Unsupported type: {prop.PropertyType.Name}" }
             };
 
@@ -157,14 +152,13 @@ public class ConfigurationForm : UserControl, IActivatableView
         return comboBox;
     }
 
-    private StackPanel CreateListBox(PropertyInfo prop, IList? list, Type listType)
+    private StackPanel CreateDataGrid(PropertyInfo prop, IList? list, Type listType)
     {
         var propName = prop.Name;
         ArgumentNullException.ThrowIfNull(list);
 
         var panel = new StackPanel();
         var itemsSource = list.Cast<object>().ToList();
-        Debug.WriteLine($"Current list value: {string.Join(", ", itemsSource)}");
         var dataGrid = new DataGrid
         {
             AutoGenerateColumns = true,
@@ -184,9 +178,7 @@ public class ConfigurationForm : UserControl, IActivatableView
         addButton.Click += (_, _) =>
         {
             Debug.WriteLine($"Adding {propName}");
-            Debug.WriteLine($"List type: {listType}, element type: {listType.GenericTypeArguments[0]}");
             var elementType = listType.GenericTypeArguments[0];
-            Debug.WriteLine($"Element type: {elementType} (IsValueType: {elementType.IsValueType})");
             var newItem = Activator.CreateInstance(elementType) ?? throw new NullReferenceException();
             var configListRef = prop.GetValue(Configuration) as IList ?? throw new NullReferenceException();
             configListRef.Add(newItem);

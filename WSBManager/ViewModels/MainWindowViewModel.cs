@@ -22,7 +22,8 @@ public class MainWindowViewModel : ReactiveObject
     private readonly ReadOnlyObservableCollection<EditableItem<string>> _tabs;
     public ReadOnlyObservableCollection<EditableItem<string>> Tabs => _tabs;
 
-    public ReactiveCommand<Unit, Unit> AddTab { get; }
+    public ReactiveCommand<Unit, Unit> AddTabCmd { get; }
+    public ReactiveCommand<EditableItem<string>, Unit> RemoveTabCmd { get; }
     [Reactive] public int SelectedTabIndex { get; set; } = -1;
 
     private readonly ObservableCollection<SandboxInstanceViewModel> _sandboxInstances = [];
@@ -38,7 +39,8 @@ public class MainWindowViewModel : ReactiveObject
             .Bind(out _tabs)
             .Subscribe();
 
-        AddTab = ReactiveCommand.Create(AddNewTab);
+        AddTabCmd = ReactiveCommand.Create(AddNewTab);
+        RemoveTabCmd = ReactiveCommand.Create<EditableItem<string>>(RemoveTab);
 
         AddNewTab();
         SwitchToTab(0);
@@ -62,7 +64,18 @@ public class MainWindowViewModel : ReactiveObject
         _tabsSource.Add(new EditableItem<string>(newTabName));
         _sandboxInstances.Add(_viewModelFactory.Create<SandboxInstanceViewModel>());
         SelectedTabIndex = _tabs.Count - 1;
-        SwitchToTab(_tabs.Count - 1);
         Debug.WriteLine($"Added new tab: {newTabName}");
+    }
+
+    private void RemoveTab(EditableItem<string> tab)
+    {
+        var index = _tabs.IndexOf(tab);
+        if (index < 0 || index >= _tabs.Count || _tabs.Count == 1) return;
+
+        _sandboxInstances.RemoveAt(index);
+        _tabsSource.RemoveAt(index);
+
+        Debug.WriteLine($"Removed tab at index: {index}");
+        Debug.WriteLine($"Current selected index: {SelectedTabIndex}");
     }
 }
