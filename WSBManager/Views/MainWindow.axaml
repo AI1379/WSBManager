@@ -4,6 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:WSBManager.ViewModels"
         xmlns:local="clr-namespace:WSBManager.Views"
+        xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="WSBManager.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -31,8 +32,21 @@
                                 DockPanel.Dock="Right">
                                 -
                             </Button>
-                            <TextBox Text="{Binding Value, Mode=TwoWay}"
-                                     BorderThickness="0">
+                            <Button DockPanel.Dock="Right" Command="{Binding ToggleCmd}">
+                                <mi:MaterialIcon Kind="Edit" />
+                            </Button>
+                            <TextBox Text="{Binding Title, Mode=TwoWay}"
+                                     IsEnabled="{Binding IsEnabled, Mode=TwoWay}"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     DockPanel.Dock="Left">
+                                <TextBox.Styles>
+                                    <Style Selector="TextBox:disabled">
+                                        <Setter Property="Opacity" Value="1" />
+                                        <Setter Property="Foreground"
+                                                Value="{Binding Foreground, RelativeSource={RelativeSource Self}}" />
+                                    </Style>
+                                </TextBox.Styles>
                             </TextBox>
                         </DockPanel>
                     </DataTemplate>
@@ -41,7 +55,7 @@
         </DockPanel>
         <GridSplitter Grid.Column="1" ResizeDirection="Columns"></GridSplitter>
         <local:SandboxInstance
-            DataContext="{Binding SandboxInstanceViewModel}"
+            DataContext="{Binding CurrentInstance}"
             Grid.Column="2">
         </local:SandboxInstance>
     </Grid>

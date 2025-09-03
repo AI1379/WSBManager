@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
-using DynamicData;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using WSBManager.Services;
@@ -12,16 +11,14 @@ namespace WSBManager.ViewModels;
 
 public class MainWindowViewModel : ReactiveObject
 {
-    private readonly SourceList<EditableItem<string>> _tabsSource = new();
-    private readonly ReadOnlyObservableCollection<EditableItem<string>> _tabs;
-    public ReadOnlyObservableCollection<EditableItem<string>> Tabs => _tabs;
+    public ObservableCollection<TabViewModel> Tabs { get; } = new();
 
     public ReactiveCommand<Unit, Unit> AddTabCmd { get; }
-    public ReactiveCommand<EditableItem<string>, Unit> RemoveTabCmd { get; }
+    public ReactiveCommand<TabViewModel, Unit> RemoveTabCmd { get; }
     [Reactive] public int SelectedTabIndex { get; set; } = -1;
 
     private readonly ObservableCollection<SandboxInstanceViewModel> _sandboxInstances = [];
-    [Reactive] public SandboxInstanceViewModel? SandboxInstanceViewModel { get; set; }
+    [Reactive] public SandboxInstanceViewModel? CurrentInstance { get; set; }
 
     private readonly IViewModelFactory _viewModelFactory;
 
@@ -29,18 +26,14 @@ public class MainWindowViewModel : ReactiveObject
     {
         _viewModelFactory = viewModelFactory ?? throw new ArgumentNullException(nameof(viewModelFactory));
 
-        _tabsSource.Connect()
-            .Bind(out _tabs)
-            .Subscribe();
-
         AddTabCmd = ReactiveCommand.Create(AddNewTab);
-        RemoveTabCmd = ReactiveCommand.Create<EditableItem<string>>(RemoveTab);
+        RemoveTabCmd = ReactiveCommand.Create<TabViewModel>(RemoveTab);
 
         AddNewTab();
         SwitchToTab(0);
 
         this.WhenAnyValue(x => x.SelectedTabIndex)
-            .Where(x => x != -1 && x < _tabs.Count)
+            .Where(x => x != -1 && x < Tabs.Count)
             .Subscribe(SwitchToTab);
 
         Debug.WriteLine("MainWindowViewModel initialized");
@@ -48,26 +41,29 @@ public class MainWindowViewModel : ReactiveObject
 
     private void SwitchToTab(int index)
     {
-        SandboxInstanceViewModel = _sandboxInstances[index];
-        Debug.WriteLine($"Switched to tab index: {index}, Name: {_tabs[index].Value}");
+        CurrentInstance = _sandboxInstances[index];
+        Debug.WriteLine($"Switched to tab index: {index}, Name: {Tabs[index].Title}");
     }
 
     private void AddNewTab()
     {
-        var newTabName = $"Tab {_tabs.Count + 1}";
-        _tabsSource.Add(new EditableItem<string>(newTabName));
+        var newTabName = $"Tab {Tabs.Count + 1}";
+        Tabs.Add(new TabViewModel(newTabName));
         _sandboxInstances.Add(_viewModelFactory.Create<SandboxInstanceViewModel>());
-        SelectedTabIndex = _tabs.Count - 1;
+        SelectedTabIndex = Tabs.Count - 1;
         Debug.WriteLine($"Added new tab: {newTabName}");
     }
 
-    private void RemoveTab(EditableItem<string> tab)
+    private void RemoveTab(TabViewModel tab)
     {
-        var index = _tabs.IndexOf(tab);
-        if (index < 0 || index >= _tabs.Count || _tabs.Count == 1) return;
+        var index = Tabs.IndexOf(tab);
+        if (index < 0 || index >= Tabs.Count || Tabs.Count == 1) return;
 
         _sandboxInstances.RemoveAt(index);
-        _tabsSource.RemoveAt(index);
+        Tabs.RemoveAt(index);
+
+        // Extra check to ensure the new tab is right
+        SwitchToTab(SelectedTabIndex);
 
         Debug.WriteLine($"Removed tab at index: {index}");
         Debug.WriteLine($"Current selected index: {SelectedTabIndex}");
