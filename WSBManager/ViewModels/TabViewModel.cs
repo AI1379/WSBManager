@@ -1,5 +1,6 @@
 ﻿using System.Reactive;
 using System.Reactive.Linq;
+using Avalonia.ReactiveUI;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -16,11 +17,12 @@ public class TabViewModel : ReactiveObject
     {
         Title = title;
         IsEnabled = isEnabled;
-        ToggleCmd = ReactiveCommand.Create(Toggle, outputScheduler: RxApp.MainThreadScheduler);
+        // The outputScheduler must be set to the main scheduler to avoid threading issues with UI updates
+        ToggleCmd = ReactiveCommand.Create(Toggle, outputScheduler: AvaloniaScheduler.Instance);
     }
 
     private void Toggle()
     {
-        Dispatcher.UIThread.Post(() => IsEnabled = !IsEnabled);
+        IsEnabled = !IsEnabled;
     }
 }
