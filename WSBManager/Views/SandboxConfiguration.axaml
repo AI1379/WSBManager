@@ -11,12 +11,16 @@
     x:DataType="vm:SandboxConfigurationViewModel"
     x:Class="WSBManager.Views.SandboxConfiguration">
     <DockPanel x:Name="StackPanel">
-        <TextBlock DockPanel.Dock="Top">This is the Sandbox Configuration component</TextBlock>
         <ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Stretch" DockPanel.Dock="Top">
             <StackPanel>
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                    <TextBlock VerticalAlignment="Center">Config file path: </TextBlock>
-                    <TextBox Text="{Binding ConfigurationFilePath}"></TextBox>
+                    <TextBlock VerticalAlignment="Center" Margin="5">Config file path: </TextBlock>
+                    <TextBox
+                        Text="{Binding ConfigurationFilePath}"
+                        Watermark="Select a configuration file..."
+                        Margin="5">
+                    </TextBox>
+                    <Button Command="{Binding SelectConfigurationFile}" Margin="5">Select File</Button>
                 </StackPanel>
                 <local:ConfigurationForm
                     Configuration="{Binding Configuration}"

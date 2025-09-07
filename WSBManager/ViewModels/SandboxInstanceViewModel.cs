@@ -9,6 +9,7 @@ namespace WSBManager.ViewModels;
 
 public class SandboxInstanceViewModel : ReactiveObject, IActivatableViewModel
 {
+    public ViewModelActivator Activator { get; } = new();
     public SandboxConfigurationViewModel SandboxConfigurationViewModel { get; }
     [Reactive] public string Title { get; set; }
 
@@ -34,6 +35,4 @@ public class SandboxInstanceViewModel : ReactiveObject, IActivatableViewModel
 
         Debug.WriteLine("SandboxInstanceViewModel initialized with EditableItem");
     }
-
-    public ViewModelActivator Activator { get; } = new();
 }

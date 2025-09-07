@@ -18,7 +18,8 @@ public class TabViewModel : ReactiveObject
     {
         IsEnabled = isEnabled;
         // The outputScheduler must be set to the main scheduler to avoid threading issues with UI updates
-        ToggleCmd = ReactiveCommand.Create(Toggle, outputScheduler: AvaloniaScheduler.Instance);
+        // We already set RxApp.MainThreadScheduler = AvaloniaScheduler.Instance; in App.xaml.cs, so we can use that here.
+        ToggleCmd = ReactiveCommand.Create(Toggle);
 
         var tabTitle1 = tabTitle;
         Title = tabTitle1.Value;
