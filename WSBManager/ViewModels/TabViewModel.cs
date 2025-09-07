@@ -1,4 +1,5 @@
-﻿using System.Reactive;
+﻿using System;
+using System.Reactive;
 using System.Reactive.Linq;
 using Avalonia.ReactiveUI;
 using Avalonia.Threading;
@@ -13,12 +14,20 @@ public class TabViewModel : ReactiveObject
     [Reactive] public bool IsEnabled { get; set; } = false;
     public ReactiveCommand<Unit, Unit> ToggleCmd { get; set; }
 
-    public TabViewModel(string title, bool isEnabled = false)
+    public TabViewModel(EditableItem<string> tabTitle, bool isEnabled = false)
     {
-        Title = title;
         IsEnabled = isEnabled;
         // The outputScheduler must be set to the main scheduler to avoid threading issues with UI updates
         ToggleCmd = ReactiveCommand.Create(Toggle, outputScheduler: AvaloniaScheduler.Instance);
+
+        var tabTitle1 = tabTitle;
+        Title = tabTitle1.Value;
+
+        this.WhenAnyValue(x => x.Title)
+            .Skip(1)
+            .Subscribe(t => tabTitle1.Value = t);
+        tabTitle1.WhenAnyValue(x => x.Value)
+            .Subscribe(title => Title = title);
     }
 
     private void Toggle()

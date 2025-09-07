@@ -11,6 +11,9 @@ namespace WSBManager.ViewModels;
 
 public class MainWindowViewModel : ReactiveObject
 {
+    public ObservableCollection<EditableItem<string>> TabTitles { get; } =
+        new ObservableCollection<EditableItem<string>>();
+
     public ObservableCollection<TabViewModel> Tabs { get; } = new();
 
     public ReactiveCommand<Unit, Unit> AddTabCmd { get; }
@@ -48,8 +51,10 @@ public class MainWindowViewModel : ReactiveObject
     private void AddNewTab()
     {
         var newTabName = $"Tab {Tabs.Count + 1}";
-        Tabs.Add(new TabViewModel(newTabName));
-        _sandboxInstances.Add(_viewModelFactory.Create<SandboxInstanceViewModel>());
+        var editableTitle = new EditableItem<string>(newTabName);
+        TabTitles.Add(editableTitle);
+        Tabs.Add(_viewModelFactory.Create<TabViewModel>(editableTitle));
+        _sandboxInstances.Add(_viewModelFactory.Create<SandboxInstanceViewModel>(editableTitle));
         SelectedTabIndex = Tabs.Count - 1;
         Debug.WriteLine($"Added new tab: {newTabName}");
     }

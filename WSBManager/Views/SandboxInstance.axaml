@@ -12,6 +12,7 @@
     x:Class="WSBManager.Views.SandboxInstance">
     <DockPanel>
         <TextBlock DockPanel.Dock="Top">This is Sandbox Instance component</TextBlock>
+        <TextBox DockPanel.Dock="Top" Text="{Binding Title}"></TextBox>
         <local:SandboxConfiguration
             Margin="10" DockPanel.Dock="Top"
             DataContext="{Binding SandboxConfigurationViewModel}">
