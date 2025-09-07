@@ -10,11 +10,25 @@
     x:DataType="vm:SandboxInstanceViewModel"
     mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
     x:Class="WSBManager.Views.SandboxInstance">
-    <DockPanel>
-        <TextBox DockPanel.Dock="Top" Text="{Binding Title}"></TextBox>
-        <local:SandboxConfiguration
-            Margin="10" DockPanel.Dock="Top"
-            DataContext="{Binding SandboxConfigurationViewModel}">
-        </local:SandboxConfiguration>
-    </DockPanel>
+    <Grid RowDefinitions="5*, 4, *">
+        <DockPanel Grid.Row="0">
+            <TextBox DockPanel.Dock="Top" Text="{Binding Title}"></TextBox>
+            <local:SandboxConfiguration
+                Margin="10"
+                DockPanel.Dock="Top"
+                DataContext="{Binding SandboxConfigurationViewModel}">
+            </local:SandboxConfiguration>
+        </DockPanel>
+        <GridSplitter Grid.Row="1" ResizeDirection="Rows"></GridSplitter>
+        <StackPanel Grid.Row="2">
+            <!--The instance statement management panel-->
+            <TextBlock Margin="5" Text="{Binding InstanceIdText}"></TextBlock>
+            <TextBlock Margin="5" Text="{Binding SandboxIpText}">Instance IP: Not running</TextBlock>
+            <StackPanel Orientation="Horizontal">
+                <Button Margin="5" Command="{Binding Start}">Start</Button>
+                <Button Margin="5" Command="{Binding Connect}">Connect</Button>
+                <Button Margin="5" Command="{Binding Stop}">Stop</Button>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
 </reactiveui:ReactiveUserControl>

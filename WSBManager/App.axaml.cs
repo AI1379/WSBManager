@@ -37,6 +37,10 @@ public partial class App : Application
             services.AddSingleton<IViewModelFactory, ViewModelFactory>();
             services.AddSingleton<IFileService>(_ => new FileService(topLevel));
 
+            // Currently the SandboxExecutor is not implemented yet, so we use the mock service.
+            // services.AddSingleton<ISandboxExecutor, MockSandboxExecutor>();
+            services.AddSingleton<ISandboxExecutor, SandboxExecutor>();
+
             var serviceProvider = services.BuildServiceProvider();
 
             desktop.MainWindow.DataContext = serviceProvider.GetRequiredService<MainWindowViewModel>();
