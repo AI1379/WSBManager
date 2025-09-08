@@ -193,6 +193,12 @@ public class SandboxExecutor : ISandboxExecutor
             throw new Exception($"Exit code: {process.ExitCode}. StdErr: {error}");
         }
 
+        if (string.IsNullOrWhiteSpace(output))
+        {
+            // Return empty JsonObject if no output
+            return new JsonObject();
+        }
+
         return JsonNode.Parse(output)?.AsObject() ?? new JsonObject();
     }
 

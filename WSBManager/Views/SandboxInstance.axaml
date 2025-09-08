@@ -22,6 +22,7 @@
         <GridSplitter Grid.Row="1" ResizeDirection="Rows"></GridSplitter>
         <StackPanel Grid.Row="2">
             <!--The instance statement management panel-->
+            <TextBlock Margin="5" Text="{Binding State}"></TextBlock>
             <TextBlock Margin="5" Text="{Binding InstanceIdText}"></TextBlock>
             <TextBlock Margin="5" Text="{Binding SandboxIpText}">Instance IP: Not running</TextBlock>
             <StackPanel Orientation="Horizontal">

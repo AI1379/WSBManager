@@ -12,15 +12,26 @@ namespace WSBManager.ViewModels;
 
 public class SandboxInstanceViewModel : ReactiveObject, IActivatableViewModel
 {
+    public enum SandboxState
+    {
+        Stopped,
+        Starting,
+        Running,
+        Stopping,
+        Error
+    }
+
     public ViewModelActivator Activator { get; } = new();
     public SandboxConfigurationViewModel SandboxConfigurationViewModel { get; }
     [Reactive] public string Title { get; set; }
 
     private readonly ISandboxExecutor _sandboxExecutor;
-    [Reactive] public Guid InstanceId { get; set; } = Guid.NewGuid();
-    [Reactive] public string SandboxIp { get; set; } = string.Empty;
-    [Reactive] public bool IsRunning { get; set; } = false;
 
+    [Reactive] private Guid InstanceId { get; set; } = Guid.Empty;
+    [Reactive] private string SandboxIp { get; set; } = string.Empty;
+    [Reactive] public SandboxState State { get; set; } = SandboxState.Stopped;
+
+    private const string NullFlag = "N/A";
     [Reactive] public string InstanceIdText { get; set; } = "Instance UUID: N/A";
     [Reactive] public string SandboxIpText { get; set; } = "Sandbox IP: N/A";
 
@@ -50,11 +61,12 @@ public class SandboxInstanceViewModel : ReactiveObject, IActivatableViewModel
                 .DisposeWith(disposables);
 
             this.WhenAnyValue(x => x.InstanceId)
-                .Subscribe(_ => InstanceIdText = $"Instance UUID: {InstanceId}")
+                .Subscribe(_ =>
+                    InstanceIdText = $"Instance UUID: {(InstanceId == Guid.Empty ? NullFlag : InstanceId)}")
                 .DisposeWith(disposables);
 
             this.WhenAnyValue(x => x.SandboxIp)
-                .Subscribe(_ => SandboxIpText = $"Sandbox IP: {SandboxIp}")
+                .Subscribe(_ => SandboxIpText = $"Sandbox IP: {(SandboxIp == string.Empty ? NullFlag : SandboxIp)}")
                 .DisposeWith(disposables);
         });
 
@@ -63,61 +75,65 @@ public class SandboxInstanceViewModel : ReactiveObject, IActivatableViewModel
 
     private async Task StartSandbox()
     {
-        if (IsRunning)
+        if (State == SandboxState.Running)
         {
-            Debug.WriteLine("Sandbox is already running.");
+            Console.WriteLine("Sandbox is already running.");
             return;
         }
 
         try
         {
+            State = SandboxState.Starting;
             InstanceId = await _sandboxExecutor.Start(SandboxConfigurationViewModel.Configuration);
-            IsRunning = true;
-            Debug.WriteLine($"Sandbox started with ID: {InstanceId}");
+            SandboxIp = await _sandboxExecutor.Ip(InstanceId);
+            State = SandboxState.Running;
+            Console.WriteLine($"Sandbox started with ID: {InstanceId}");
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Error starting sandbox: {ex.Message}");
+            Console.WriteLine($"Error starting sandbox: {ex.Message}");
         }
     }
 
     private async Task StopSandbox()
     {
-        if (!IsRunning)
+        if (State == SandboxState.Stopped)
         {
-            Debug.WriteLine("Sandbox is not running.");
+            Console.WriteLine("Sandbox is not running.");
             return;
         }
 
         try
         {
+            State = SandboxState.Stopping;
             await _sandboxExecutor.Stop(InstanceId);
-            IsRunning = false;
-            Debug.WriteLine($"Sandbox with ID: {InstanceId} stopped.");
+            InstanceId = Guid.Empty;
+            SandboxIp = string.Empty;
+            State = SandboxState.Stopped;
+            Console.WriteLine($"Sandbox with ID: {InstanceId} stopped.");
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Error stopping sandbox: {ex.Message}");
+            Console.WriteLine($"Error stopping sandbox: {ex.Message}");
         }
     }
 
     private async Task ConnectSandbox()
     {
-        if (!IsRunning)
+        if (State == SandboxState.Stopped)
         {
-            Debug.WriteLine("Sandbox is not running. Cannot connect.");
+            Console.WriteLine("Sandbox is not running. Cannot connect.");
             return;
         }
 
         try
         {
             await _sandboxExecutor.Connect(InstanceId);
-            SandboxIp = await _sandboxExecutor.Ip(InstanceId);
-            Debug.WriteLine($"Connected to sandbox with ID: {InstanceId}, IP: {SandboxIp}");
+            Console.WriteLine($"Connected to sandbox with ID: {InstanceId}, IP: {SandboxIp}");
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Error connecting to sandbox: {ex.Message}");
+            Console.WriteLine($"Error connecting to sandbox: {ex.Message}");
         }
     }
 }
